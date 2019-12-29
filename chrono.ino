@@ -51,7 +51,6 @@ void setup() {
     pinMode(resetPin, INPUT);
     lcd.clear();
     lcd.setCursor(0, 0);
-//    lcd.print("Lap   :");
     if (n_laps > 0) {
       mean_lap = 1.*lap_total/n_laps;
     }
@@ -60,11 +59,7 @@ void setup() {
     }
     sprintf(to_write, "Mean: %2d.%02d s", int(mean_lap/1000), int((mean_lap%1000)/10));
     lcd.print(to_write);
-//    lcd.print(n_laps);
-//    lcd.print("/");
-//    lcd.print(lap_total);
     lcd.setCursor(0, 1);
-//    lcd.print("Time  :");
     sprintf(to_write, "Best: %2d.%02d s", int(best_lap/1000), int((best_lap%1000)/10));
     lcd.print(to_write);
     running = false;
@@ -108,32 +103,14 @@ void loop() {
 void semaphore() {
   lcd.clear();
   // semaphore
-  delay(TIME_SEMAPHORE);
-  lcd.setCursor(1, 0);
-  lcd.print("**");
-  lcd.setCursor(1, 1);
-  lcd.print("**");
-  delay(TIME_SEMAPHORE);
-  lcd.setCursor(1, 0);
-  lcd.print("** **");
-  lcd.setCursor(1, 1);
-  lcd.print("** **");
-  delay(TIME_SEMAPHORE);
-  lcd.setCursor(1, 0);
-  lcd.print("** ** **");
-  lcd.setCursor(1, 1);
-  lcd.print("** ** **");
-  delay(TIME_SEMAPHORE);
-  lcd.setCursor(1, 0);
-  lcd.print("** ** ** **");
-  lcd.setCursor(1, 1);
-  lcd.print("** ** ** **");
-  delay(TIME_SEMAPHORE);
-  lcd.setCursor(1, 0);
-  lcd.print("** ** ** ** **");
-  lcd.setCursor(1, 1);
-  lcd.print("** ** ** ** **");
-  delay(TIME_SEMAPHORE);
+  for (int i=0; i<6; ++i) {
+    delay(TIME_SEMAPHORE);
+    lcd.setCursor(1+i*3, 0);
+    lcd.print("**");
+    lcd.setCursor(1+i*3, 1);
+    lcd.print("**");
+    tone(piezoPin, 100, 100);
+  }
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Lap   :");
@@ -143,6 +120,7 @@ void semaphore() {
   lcd.print("0");
   lcd.setCursor(0, 1);
   lcd.print("Time  :");
+  tone(piezoPin, 1000, 1000);
 }
 
 
@@ -175,13 +153,19 @@ void updateLap() {
     old_now = now;
   }
 
-  if (1 <= (TOTAL_LAPS-n_laps) <= 5) {
-    tone(piezoPin, 1000, 100);
+  if (TOTAL_LAPS-n_laps>5 and n_laps>0) {
+    tone(piezoPin, 500, 50);
+  }
+  
+  if (TOTAL_LAPS-n_laps <= 5) {
+    tone(piezoPin, 1000, 200);
+  }
+  
+  if ((TOTAL_LAPS-n_laps) == 0) {
+    tone(piezoPin, 2500, 500);
   }
 
-  if ((TOTAL_LAPS-n_laps) == 0) {
-    tone(piezoPin, 5000, 500);
-  }
+  
   
   old_time = now;
 }
