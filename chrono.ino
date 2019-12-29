@@ -1,7 +1,5 @@
 /*
-Code for crystal_ball.
-Taken from the Arduino Uno Starter Kit.
-
+Adapted from the crystal_ball example code in the Arduino Uno Starter Kit.
 By Leonardo Stefanini and Fabio Stefanini
 */
 
@@ -46,6 +44,7 @@ bool running = false;
   lcd.print(to_write);
 }*/
 
+
 void setup() {
     lcd.begin(16, 2);
     pinMode(switchPin, INPUT);
@@ -73,6 +72,7 @@ void setup() {
     lap_total = 0;
     best_lap = 0;
 }
+
 
 void loop() {
     switchState = digitalRead(switchPin);
@@ -103,6 +103,7 @@ void loop() {
     prevSwitchState = switchState;
     prevResetState = resetState;
 }
+
 
 void semaphore() {
   lcd.clear();
@@ -144,6 +145,7 @@ void semaphore() {
   lcd.print("Time  :");
 }
 
+
 void updateLap() {
   now = millis();
   lap_time = now - old_time;
@@ -183,6 +185,7 @@ void updateLap() {
   
   old_time = now;
 }
+
 
 void updateTime() {
   lcd.setCursor(7, 1);
