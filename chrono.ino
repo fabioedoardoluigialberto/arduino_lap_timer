@@ -22,12 +22,12 @@ unsigned long now = 0;
 unsigned long old_now = 0;
 const unsigned long MAX_TIME = 300000;  // millis
 const unsigned long UPDATE_TIME = 10;  // millis
-const unsigned long TOTAL_LAPS = 20;  // total laps
+int TOTAL_LAPS = 20;  // total laps
 //unsigned long laps[TOTAL_LAPS];
 unsigned long best_lap = 0;
 unsigned long lap_total = 0;
 unsigned long mean_lap = 0;
-unsigned long n_laps = 0;
+int n_laps = -1;
 
 const unsigned long TIME_SEMAPHORE = 1000;  // millis
 
@@ -63,7 +63,8 @@ void setup() {
     sprintf(to_write, "Best: %2d.%02d s", int(best_lap/1000), int((best_lap%1000)/10));
     lcd.print(to_write);
     running = false;
-    n_laps = 0;
+    // first lap is when car crosses start line
+    n_laps = -1;
     lap_total = 0;
     best_lap = 0;
 }
@@ -139,7 +140,6 @@ void updateLap() {
     lcd.setCursor(4, 0);
     sprintf(to_write, "%2d", n_laps);
     lcd.print(to_write);
-//        laps[n_laps-1] = lap_time;
     if (best_lap == 0 or lap_time<best_lap) {
       best_lap = lap_time;
     }
@@ -164,10 +164,9 @@ void updateLap() {
   if ((TOTAL_LAPS-n_laps) == 0) {
     tone(piezoPin, 2500, 500);
   }
-
-  
   
   old_time = now;
+  
 }
 
 
