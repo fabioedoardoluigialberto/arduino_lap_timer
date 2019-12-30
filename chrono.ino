@@ -106,6 +106,7 @@ void loop() {
         semaphore();
         now = millis();
         old_now = now;
+        old_time = now;
       }
     }
 
@@ -131,7 +132,6 @@ void loop() {
     prevSwitchState = switchState;
     prevResetState = resetState;
 }
-
 
 void semaphore() {
   lcd.clear();
