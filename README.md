@@ -4,7 +4,7 @@ Lap timer for slot car racing.
 
 It shows a semaphore to start, then times all laps until a given number of laps or reset button is pressed, then shows mean time and best lap.
 It works on one lane, one car.
-Tested on [Carrera Go! Ferrari Edition](https://www.amazon.com/Carrera-Ferrari-Spirit-Electric-Racing/dp/B07PFYGTJ1/ref=sr_1_1?keywords=carrera+go+ferrari&qid=1577680615&sr=8-1) (1:43)
+Tested on [Carrera Go! Ferrari Edition](https://www.amazon.com/Carrera-Ferrari-Spirit-Electric-Racing/dp/B07PFYGTJ1/ref=sr_1_1?keywords=carrera+go+ferrari&qid=1577680615&sr=8-1) (1:43).
 
 ## Schematics
 
