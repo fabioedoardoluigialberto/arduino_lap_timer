@@ -57,10 +57,10 @@ void setup() {
     else {
       mean_lap = 0;
     }
-    sprintf(to_write, "Mean: %2d.%02d s", int(mean_lap/1000), int((mean_lap%1000)/10));
+    sprintf(to_write, "Mean:  %4d.%02d s", int(mean_lap/1000), int((mean_lap%1000)/10));
     lcd.print(to_write);
     lcd.setCursor(0, 1);
-    sprintf(to_write, "Best: %2d.%02d s", int(best_lap/1000), int((best_lap%1000)/10));
+    sprintf(to_write, "Best:  %4d.%02d s", int(best_lap/1000), int((best_lap%1000)/10));
     lcd.print(to_write);
     running = false;
     // first lap is when car crosses start line
@@ -128,13 +128,15 @@ void semaphore() {
 void updateLap() {
   now = millis();
   lap_time = now - old_time;
-  lcd.setCursor(9, 0);
-  if (lap_time >= 60000 and running) {
-    lcd.print("> 1m  ");
-    lap_total += lap_time;
-  }
-  if (lap_time < 60000 and running) {
-    sprintf(to_write, "%2d.%02d s", int(lap_time/1000), int((lap_time%1000)/10));
+  lcd.setCursor(7, 0);
+//  if (lap_time >= 60000 and running) {
+//    lcd.print("    > 1 m");
+//    lap_total += lap_time;
+//  }
+//  if (lap_time < 60000 and running) {
+  if (running) {  
+//    writeTime(lap_time);
+    sprintf(to_write, "%4d.%02d s", int(lap_time/1000), int((lap_time%1000)/10));
     lcd.print(to_write);
     n_laps += 1;
     lcd.setCursor(4, 0);
