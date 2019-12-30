@@ -6,6 +6,31 @@ By Leonardo Stefanini and Fabio Stefanini
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
+// total time before forced reset
+const unsigned long MAX_TIME = 60000;  // millis
+// update clock time
+const unsigned long UPDATE_TIME = 10;  // millis
+// avoid double signaling of a lap
+const unsigned long LAP_TIME_THRESHOLD = 500;  // millis
+// time between lights in the semaphore
+const unsigned long TIME_SEMAPHORE = 1000;  // millis
+// total laps
+int TOTAL_LAPS = 20;
+// last laps
+int LAST_LAPS = 5;
+// tones
+int TONE0 = 100;      // semaphore
+int TONE0_DUR = 100;  // duration, millis
+int TONE1 = 500;      // lap
+int TONE1_DUR = 50;
+int TONE2 = 1000;     // last laps
+int TONE2_DUR = 50;
+int TONE3 = 2500;     // race start and end
+int TONE3_DUR = 500;
+
+
+
+
 const int switchPin = 6;
 const int resetPin = 8;
 const int piezoPin = 9;
@@ -20,21 +45,13 @@ unsigned long lap_time = 0;
 unsigned long old_time = 0;
 unsigned long now = 0;
 unsigned long old_now = 0;
-// total time before forced reset
-const unsigned long MAX_TIME = 60000;  // millis
-// update clock time
-const unsigned long UPDATE_TIME = 10;  // millis
-// avoid double signaling of a lap
-const unsigned long LAP_TIME_THRESHOLD = 500;  // millis
-// total laps
-int TOTAL_LAPS = 20;
+
 //unsigned long laps[TOTAL_LAPS];
 unsigned long best_lap = 0;
 unsigned long lap_total = 0;
 unsigned long mean_lap = 0;
 int n_laps = -1;
 
-const unsigned long TIME_SEMAPHORE = 1000;  // millis
 
 bool running = false;
 
@@ -48,7 +65,6 @@ bool running = false;
   }
   lcd.print(to_write);
 }*/
-
 
 void setup() {
     lcd.begin(16, 2);
@@ -126,7 +142,7 @@ void semaphore() {
     lcd.print("**");
     lcd.setCursor(1+i*3, 1);
     lcd.print("**");
-    tone(piezoPin, 100, 100);
+    tone(piezoPin, TONE0, TONE0_DUR);
   }
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -137,7 +153,7 @@ void semaphore() {
   lcd.print("0");
   lcd.setCursor(0, 1);
   lcd.print("Time  :");
-  tone(piezoPin, 1000, 1000);
+  tone(piezoPin, TONE3, TONE3_DUR);
 }
 
 
@@ -163,16 +179,16 @@ void updateLap() {
     lap_total += lap_time;
   }
   
-  if (TOTAL_LAPS-n_laps>5 and n_laps>0) {
-    tone(piezoPin, 500, 50);
+  if (TOTAL_LAPS-n_laps>LAST_LAPS and n_laps>0) {
+    tone(piezoPin, TONE1, TONE1_DUR);
   }
   
-  if (TOTAL_LAPS-n_laps <= 5) {
-    tone(piezoPin, 1000, 200);
+  if (TOTAL_LAPS-n_laps <= LAST_LAPS) {
+    tone(piezoPin, TONE2, TONE2_DUR);
   }
   
   if ((TOTAL_LAPS-n_laps) == 0) {
-    tone(piezoPin, 2500, 500);
+    tone(piezoPin, TONE3, TONE3_DUR);
   }
   
   old_time = now;
