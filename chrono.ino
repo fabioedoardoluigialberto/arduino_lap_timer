@@ -20,9 +20,14 @@ unsigned long lap_time = 0;
 unsigned long old_time = 0;
 unsigned long now = 0;
 unsigned long old_now = 0;
-const unsigned long MAX_TIME = 300000;  // millis
+// total time before forced reset
+const unsigned long MAX_TIME = 60000;  // millis
+// update clock time
 const unsigned long UPDATE_TIME = 10;  // millis
-int TOTAL_LAPS = 20;  // total laps
+// avoid double signaling of a lap
+const unsigned long LAP_TIME_THRESHOLD = 500;  // millis
+// total laps
+int TOTAL_LAPS = 20;
 //unsigned long laps[TOTAL_LAPS];
 unsigned long best_lap = 0;
 unsigned long lap_total = 0;
@@ -73,7 +78,8 @@ void setup() {
 void loop() {
     switchState = digitalRead(switchPin);
     resetState = digitalRead(resetPin);
-
+    now = millis();
+    
     // reset
     if (resetState != prevResetState and resetState == HIGH) {
       if (running) {
@@ -89,11 +95,13 @@ void loop() {
 
     // lap
     if (switchState != prevSwitchState and switchState == HIGH) {
-      updateLap();
+      lap_time = now - old_time;
+      if (lap_time >= LAP_TIME_THRESHOLD) {
+        updateLap();
+      }
     }
 
     // update time
-    now = millis();
     if (now-old_now>UPDATE_TIME and running) {
       updateTime();
     }
@@ -134,8 +142,7 @@ void semaphore() {
 
 
 void updateLap() {
-  now = millis();
-  lap_time = now - old_time;
+
   lcd.setCursor(7, 0);
 //  if (lap_time >= 60000 and running) {
 //    lcd.print("    > 1 m");
