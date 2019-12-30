@@ -76,7 +76,15 @@ void loop() {
 
     // reset
     if (resetState != prevResetState and resetState == HIGH) {
-      setup();
+      if (running) {
+        setup();
+      }
+      else {
+        running = true;
+        semaphore();
+        now = millis();
+        old_now = now;
+      }
     }
 
     // lap
@@ -148,13 +156,6 @@ void updateLap() {
     lap_total += lap_time;
   }
   
-  if (not running) {
-    running = true;
-    semaphore();
-    now = millis();
-    old_now = now;
-  }
-
   if (TOTAL_LAPS-n_laps>5 and n_laps>0) {
     tone(piezoPin, 500, 50);
   }
