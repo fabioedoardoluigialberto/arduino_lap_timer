@@ -11,9 +11,13 @@ const unsigned long MAX_TIME = 60000;  // millis
 // update clock time
 const unsigned long UPDATE_TIME = 10;  // millis
 // avoid double signaling of a lap
-const unsigned long LAP_TIME_THRESHOLD = 500;  // millis
+const unsigned long LAP_TIME_THRESHOLD = 1000;  // millis
 // time between lights in the semaphore
 const unsigned long TIME_SEMAPHORE = 1000;  // millis
+// typical lap time (Carrera Go! -> 2700)
+const unsigned long TYPICAL_LAP_TIME = 2700;  // millis
+// typical lap time tolerance
+const unsigned long TYPICAL_LAP_TIME_TOL = 2000;  // millis
 // total laps
 int TOTAL_LAPS = 20;
 // last laps
@@ -27,9 +31,6 @@ int TONE2 = 1000;     // last laps
 int TONE2_DUR = 50;
 int TONE3 = 2500;     // race start and end
 int TONE3_DUR = 500;
-
-
-
 
 const int switchPin = 6;
 const int resetPin = 8;
@@ -160,23 +161,25 @@ void semaphore() {
 void updateLap() {
 
   lcd.setCursor(7, 0);
-//  if (lap_time >= 60000 and running) {
-//    lcd.print("    > 1 m");
-//    lap_total += lap_time;
-//  }
-//  if (lap_time < 60000 and running) {
+
   if (running) {  
-//    writeTime(lap_time);
-    sprintf(to_write, "%4d.%02d s", int(lap_time/1000), int((lap_time%1000)/10));
-    lcd.print(to_write);
-    n_laps += 1;
-    lcd.setCursor(4, 0);
-    sprintf(to_write, "%2d", n_laps);
-    lcd.print(to_write);
-    if (best_lap == 0 or lap_time<best_lap) {
-      best_lap = lap_time;
+    // valid lap
+    if (lap_time<(TYPICAL_LAP_TIME+TYPICAL_LAP_TIME_TOL)) {      
+      sprintf(to_write, "%4d.%02d s", int(lap_time/1000), int((lap_time%1000)/10));
+      lcd.print(to_write);
+      n_laps += 1;
+      lcd.setCursor(4, 0);
+      sprintf(to_write, "%2d", n_laps);
+      lcd.print(to_write);
+      if (best_lap == 0 or lap_time<best_lap) {
+        best_lap = lap_time;
+      }
+      lap_total += lap_time;
     }
-    lap_total += lap_time;
+    else {
+      sprintf(to_write, "-invalid-");
+      lcd.print(to_write);
+    }
   }
   
   if (TOTAL_LAPS-n_laps>LAST_LAPS and n_laps>0) {
