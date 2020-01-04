@@ -20,6 +20,8 @@ const unsigned long TIME_SEMAPHORE = 1000;  // millis
 const unsigned long TYPICAL_LAP_TIME = 2700;  // millis
 // typical lap time tolerance
 const unsigned long TYPICAL_LAP_TIME_TOL = 2000;  // millis
+// lap time penalty
+const unsigned long LAP_TIME_PEN = 5000;  // millis
 // total laps
 int TOTAL_LAPS = 20;
 // last laps
@@ -46,12 +48,13 @@ int summaryVar[2] = {0, 0};
 
 char to_write[16];
 unsigned long lap_time[2];
-unsigned long old_time[2];
+unsigned long old_now_lap[2];
 unsigned long now;
 unsigned long old_now[2];
 unsigned long best_lap[2];
 unsigned long lap_total[2];
 unsigned long mean_lap[2];
+unsigned long penalties[2];
 int n_laps[2] = {-1, -1};
 unsigned long now_scroll[2] = {0, 0};
 
@@ -95,25 +98,26 @@ void loop() {
       semaphore();
       now = millis();
       old_now[0] = now;
-      old_time[0] = now;
+      old_now_lap[0] = now;
       old_now[1] = now;
-      old_time[1] = now;
+      old_now_lap[1] = now;
     }
   }
-    
+
+  // update racers
   for (int i=0; i<2; ++i) {
     switchState[i] = digitalRead(switchPin[i]);
 
     if (running[i]) {
       // lap
       if (switchState[i] != prevSwitchState[i] and switchState[i] == HIGH) {
-        lap_time[i] = now - old_time[i];
+        lap_time[i] = now - old_now_lap[i];
         if (lap_time[i] >= LAP_TIME_THRESHOLD) {
           updateLap(i);
         }
       }
   
-      // update time
+      // time
       if (now-old_now[i]>UPDATE_TIME) {
         updateTime(i);
         old_now[i] = now;
@@ -125,23 +129,24 @@ void loop() {
         setup();
         old_now = now;
       }*/
-      if (now-old_now[i]>MAX_TIME or n_laps[i]>=TOTAL_LAPS) {
+      if (now-old_now_lap[i]>MAX_TIME or n_laps[i]>=TOTAL_LAPS) {
         summary(i);
         old_now[i] = now;
         running[i] = false;
       }
     }
-      // scroll
+    
+    // scroll
     else {
       if (now-now_scroll[i]>SCROLL_TIME) {
         summary(i);
         now_scroll[i] = now;
       }
     }
+    
     prevSwitchState[i] = switchState[i];
-  }    
-
-  
+  }
+    
   prevResetState = resetState;
 
 }
@@ -182,8 +187,10 @@ void updateLap(int i) {
     }
     lap_total[i] += lap_time[i];
   }
+  // invalid lap
   else {
     sprintf(to_write, "  -inv-  ");
+    penalties[i] += LAP_TIME_PEN;
     lcd.print(to_write);
   }
   
@@ -199,13 +206,13 @@ void updateLap(int i) {
     tone(piezoPin, TONE3, TONE3_DUR);
   }
   
-  old_time[i] = now;
+  old_now_lap[i] = now;
   
 }
 
 void updateTime(int i) {
   lcd.setCursor(2, i);
-  sprintf(to_write, "%2d.%01d", int((now-old_time[i])/1000), int(((now-old_time[i])%1000)/100));
+  sprintf(to_write, "%2d.%01d", int((now-old_now_lap[i])/1000), int(((now-old_now_lap[i])%1000)/100));
   lcd.print(to_write);
 }
 
@@ -232,14 +239,22 @@ void summary(int i) {
     }
     if (summaryVar[i] == 2) {
       sprintf(to_write, "tot %3d.%02ds  ", int(lap_total[i]/1000), int((lap_total[i]%1000)/10));
-      summaryVar[i] = -1;
+    }
+    if (summaryVar[i] == 3) {
+      sprintf(to_write, " +  %3d.%02ds  ", int(penalties[i]/1000), int((penalties[i]%1000)/10));
+    }
+    if (summaryVar[i] == 4) {
+      sprintf(to_write, "fin %3d.%02ds  ", int((lap_total[i]+penalties[i])/1000),
+                                           int(((lap_total[i]+penalties[i])%1000)/10));
     }
     lcd.print(to_write); 
-    summaryVar[i] += 1;   
+    summaryVar[i] += 1;
+    summaryVar[i] %= 5;     
 }
 
 void resetLaps(int i) {
   n_laps[i] = -1;
   lap_total[i] = 0;
   best_lap[i] = 0;
+  penalties[i] = 0;
 }
