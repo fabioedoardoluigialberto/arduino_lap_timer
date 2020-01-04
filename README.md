@@ -31,15 +31,36 @@ For instance, if 200 ms pass between GO! signal and 20 is the total number of la
 
 ## Valid laps
 
-I found it useful to filter out invalid laps when testing things out.
+I found it useful to filter out invalid laps.
 Invalid laps are when the sensor is activate too quickly (laps < 1s) or when a lap took too long, e.g., when car went off track.
 I considered an average time of 2.7 s to complete the track so a valid lap is below 2.7+5s.
-This is useful because at then end, the total time will consider everything, including the time it takes to put a car back on the lane, but the mean and best lap will reflect actual complete laps without leaving the track.
-The timing ends when 20 valid laps are completed, while the total time will continue to accumulate even for invalid laps!
+The total time will consider only valid laps but 5s will be added to every invalid lap.
+The timing ends when 20 valid laps are completed.
+
+## Summary screen description
+
+The summary screan displays:
+ - `mean`
+   mean time on lap for valid laps
+ - `best`
+   best valid lap
+ - `tot`
+   total time to complete 20 valid laps (or until reset)
+ - ` + `
+   invalid lap penalties to be added
+ - `fin`
+   final time including penalties
 
 ## Note on the sensors
 
-I started with an [infrared obstacle avoidance module](https://www.amazon.com/gp/product/B01I57HIJ0/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1).
+I started with an [infrared obstacle avoidance module](https://www.amazon.com/gp/product/B01I57HIJ0/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1) which mounts proximity sensors.
 Not the best perhaps but after tuning sensitivity to decently high, it seems to do the job when positioned close to the track.
-A better option is definetely to use [reed sensors](https://www.amazon.com/Sensor-Module-Magnetron-Normally-Magnetic/dp/B01FDHG1CA/ref=sr_1_1?crid=353U749WXA2XZ&keywords=reed+sensor+module&qid=1577680755&sprefix=reed+se%2Caps%2C171&sr=8-1) mounted underneath the track under each lane.
-Even better would perhaps be a [hall effect sensor](https://www.amazon.com/WINGONEER-Effect-KY-003-Magnetic-Arduino/dp/B06XHG9CYN/ref=sr_1_6?crid=2J5NX9VJBVSQ1&keywords=hall+effect+sensor+module&qid=1577680925&sprefix=hall+eff%2Caps%2C209&sr=8-6) but haven't tried yet.
+I used Lego to position two of them on top of each lane.
+A better option would be to use [reed sensors](https://www.amazon.com/Sensor-Module-Magnetron-Normally-Magnetic/dp/B01FDHG1CA/ref=sr_1_1?crid=353U749WXA2XZ&keywords=reed+sensor+module&qid=1577680755&sprefix=reed+se%2Caps%2C171&sr=8-1) mounted underneath the track under each lane.
+They are extremely fragile but their sensitivity is close to perfection since they nicely sense the engines magnets.
+Unfortunately I found it a bit hard to mount them underneath the track so the Lego one was a quicker solution.
+Even better would perhaps to use [hall effect sensors](https://www.amazon.com/WINGONEER-Effect-KY-003-Magnetic-Arduino/dp/B06XHG9CYN/ref=sr_1_6?crid=2J5NX9VJBVSQ1&keywords=hall+effect+sensor+module&qid=1577680925&sprefix=hall+eff%2Caps%2C209&sr=8-6).
+They have a virtually infinite lifetime and they are extremely compact to be easily embedded in the track.
+I was very surprised to find out that the ones I bought had very low sensitivity, especially for one of the cars.
+As of now, and to my disappointment, the working solution is to use proximity sensors mounted on top of the lanes with Lego.
+Bulky but working.
